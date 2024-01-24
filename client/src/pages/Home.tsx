@@ -9,7 +9,6 @@ const Home = () => {
   return (
     <RootLayout>
       <div className="">
-        <h2>Demo Image</h2>
         <img src={img} alt="" />
       </div>
     </RootLayout>
