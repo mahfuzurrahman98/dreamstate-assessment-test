@@ -15,7 +15,7 @@ const Footer = () => {
           <a
             href="https://mahfuzurrahman98.github.io"
             target="blank"
-            className="text-green-600 font-semibold"
+            className="text-amber-600 font-semibold"
           >
             Mahfuzur Rahman Arif
           </a>

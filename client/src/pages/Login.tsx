@@ -113,7 +113,7 @@ const Login = () => {
                 id="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="mt-1 px-3 py-2 w-full border rounded-md focus:outline-amber-800"
+                className="mt-1 px-3 py-2 w-full border rounded-md focus:outline-amber-700"
                 placeholder="Enter your email"
                 autoComplete="email"
                 required
@@ -129,7 +129,7 @@ const Login = () => {
                 id="password"
                 value={formData.password}
                 onChange={handleChange}
-                className="mt-1 px-3 py-2 w-full border rounded-md focus:outline-amber-800"
+                className="mt-1 px-3 py-2 w-full border rounded-md focus:outline-amber-700"
                 placeholder="Enter your password"
                 autoComplete="current-password"
                 required
@@ -137,7 +137,7 @@ const Login = () => {
             </div>
             <button
               type="submit"
-              className={`w-full bg-amber-700 text-white px-3 py-2 rounded-md text-md hover:bg-amber-600 focus:outline-none focus:shadow-outline-amber active:bg-amber-800 ${
+              className={`w-full bg-amber-800 text-white px-3 py-2 rounded-md text-md hover:bg-amber-700 focus:outline-none focus:shadow-outline-amber active:bg-amber-800 ${
                 loading ? 'opacity-50 cursor-not-allowed' : ''
               }`}
               disabled={loading}

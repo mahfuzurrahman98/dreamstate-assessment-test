@@ -13,7 +13,7 @@ const Header: FC = () => {
         <div className="flex items-center">
           <Link
             to="/"
-            className="text-2xl font-semibold text-green-800 leading-none"
+            className="text-2xl font-semibold text-amber-800 leading-none"
           >
             MERN Project
           </Link>
@@ -35,7 +35,7 @@ const Header: FC = () => {
             <div className="flex items-center">
               <Link
                 to="/login"
-                className="bg-green-700 text-white px-3 py-1 rounded-md hover:bg-green-600"
+                className="bg-amber-800 text-white px-3 py-1 rounded-md hover:bg-amber-700"
               >
                 Login
               </Link>
