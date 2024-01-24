@@ -8,12 +8,12 @@ const Header: FC = () => {
   const logout = useLogout();
 
   return (
-    <div className="bg-white shadow px-4">
-      <nav className="w-full flex justify-between items-center mx-auto h-14 max-w-6xl">
+    <div className="bg-white shadow">
+      <nav className="w-full flex justify-between items-center mx-auto h-14 max-w-6xl px-4">
         <div className="flex items-center">
           <Link
             to="/"
-            className="text-2xl font-extrabold text-green-800 leading-none"
+            className="text-2xl font-semibold text-green-800 leading-none"
           >
             MERN Project
           </Link>
