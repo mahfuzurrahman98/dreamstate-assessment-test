@@ -17,3 +17,5 @@ client/.env
 
 # server files to ignore
 server/.env
+server/node_modules
+server/dist
