@@ -87,8 +87,8 @@ const Login = () => {
         }}
       />
       <div className="flex items-center justify-center mt-8 lg:mt-24">
-        <div className="bg-white p-6 md:px-8 py-6 rounded shadow-md w-96">
-          <h1 className="text-xl font-semibold mb-6">Login</h1>
+        <div className="bg-white p-6 md:px-8 rounded shadow-md w-96">
+          <h1 className="text-2xl font-semibold mb-6">Login to start</h1>
 
           {error && (
             <div className="bg-red-500 text-white px-3 py-1 rounded-md mb-4">
@@ -104,7 +104,7 @@ const Login = () => {
           )}
           <form onSubmit={handleSubmit}>
             <div className="mb-4">
-              <label htmlFor="email" className="block text-md font-medium">
+              <label htmlFor="email" className="block text-md font-semibold">
                 Email
               </label>
               <input
@@ -113,14 +113,14 @@ const Login = () => {
                 id="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="mt-1 px-2 py-1 w-full border rounded-md focus:outline-green-800"
+                className="mt-1 px-3 py-2 w-full border rounded-md focus:outline-amber-800"
                 placeholder="Enter your email"
                 autoComplete="email"
                 required
               />
             </div>
             <div className="mb-4">
-              <label htmlFor="password" className="block text-md font-medium">
+              <label htmlFor="password" className="block text-md font-semibold">
                 Password
               </label>
               <input
@@ -129,7 +129,7 @@ const Login = () => {
                 id="password"
                 value={formData.password}
                 onChange={handleChange}
-                className="mt-1 px-2 py-1 w-full border rounded-md focus:outline-green-800"
+                className="mt-1 px-3 py-2 w-full border rounded-md focus:outline-amber-800"
                 placeholder="Enter your password"
                 autoComplete="current-password"
                 required
@@ -137,7 +137,7 @@ const Login = () => {
             </div>
             <button
               type="submit"
-              className={`bg-green-700 text-white px-3 py-1 rounded-md text-md hover:bg-green-600 focus:outline-none focus:shadow-outline-green active:bg-green-800 ${
+              className={`w-full bg-amber-700 text-white px-3 py-2 rounded-md text-md hover:bg-amber-600 focus:outline-none focus:shadow-outline-amber active:bg-amber-800 ${
                 loading ? 'opacity-50 cursor-not-allowed' : ''
               }`}
               disabled={loading}
@@ -151,7 +151,7 @@ const Login = () => {
               Don't have an account?{' '}
               <Link
                 to="/register"
-                className="underline text-green-700 font-semibold"
+                className="underline text-amber-700 font-semibold"
               >
                 Register
               </Link>
