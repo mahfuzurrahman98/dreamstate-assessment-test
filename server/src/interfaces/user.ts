@@ -10,3 +10,11 @@ export interface IUser extends Document {
     updatedAt: Date;
     deletedAt?: Date | null;
 }
+
+export interface IUserInputDTO {
+    name: string;
+    email: string;
+    password: string;
+    google_auth?: boolean;
+    active: boolean;
+}
