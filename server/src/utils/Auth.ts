@@ -1,15 +1,22 @@
 import { NextFunction, Request, Response } from 'express';
 import { sign, verify } from 'jsonwebtoken';
+import CustomError from './CustomError';
 
-interface IRequest extends Request {
-    user?: any;
+interface IRequestWithUser extends Request {
+    user?: object;
 }
 
 class Auth {
     public static createAccessToken(user: object): string {
+        let expiresIn: string;
         try {
-            const expiresIn: string =
+            expiresIn =
                 (process.env.ACCESS_TOKEN_EXPIRE_MINUTES as string) + 'm';
+        } catch (error: any) {
+            throw new CustomError(500, error.message || 'Something went wrong');
+        }
+
+        try {
             const token = sign(
                 { user },
                 process.env.ACCESS_TOKEN_SECRET as string,
@@ -20,13 +27,21 @@ class Auth {
             );
             return token;
         } catch (error: any) {
-            throw new Error(error);
+            throw new CustomError(401, 'Unauthorized');
         }
     }
 
     public static createRefreshToken(user: object): string {
+        let expiresIn: string;
         try {
-            const expiresIn: string =
+            expiresIn =
+                (process.env.ACCESS_TOKEN_EXPIRE_MINUTES as string) + 'm';
+        } catch (error: any) {
+            throw new CustomError(500, error.message || 'Something went wrong');
+        }
+
+        try {
+            expiresIn =
                 (process.env.REFRESH_TOKEN_EXPIRE_MINUTES as string) + 'm';
             const token = sign(
                 { user },
@@ -38,7 +53,7 @@ class Auth {
             );
             return token;
         } catch (error: any) {
-            throw new Error(error);
+            throw new CustomError(401, 'Unauthorized');
         }
     }
 
@@ -49,7 +64,7 @@ class Auth {
                 process.env.ACCESS_TOKEN_SECRET as string
             ) as object;
         } catch (error: any) {
-            throw new Error(error);
+            throw new CustomError(401, 'Unauthorized from Auth');
         }
     }
 
@@ -60,12 +75,12 @@ class Auth {
                 process.env.REFRESH_TOKEN_SECRET as string
             ) as object;
         } catch (error: any) {
-            throw new Error(error);
+            throw new CustomError(401, 'Unauthorized');
         }
     }
 
     public static async isAuthenticated(
-        req: IRequest,
+        req: IRequestWithUser,
         res: Response,
         next: NextFunction
     ): Promise<Response | void> {
@@ -81,11 +96,7 @@ class Auth {
         console.log('token: ', token);
 
         if (!token) {
-            return res.status(401).json({
-                success: false,
-                status: 401,
-                message: 'Unauthorizex',
-            });
+            return next(new CustomError(401, 'Unauthorized'));
         }
 
         try {
@@ -93,22 +104,14 @@ class Auth {
 
             // decoded have user and user have email, if not then return error
             if (!decoded.user || !decoded.user.email) {
-                return res.status(401).json({
-                    success: false,
-                    status: 401,
-                    message: 'Unauthorized',
-                });
+                return next(new CustomError(401, 'Unauthorized'));
             }
 
             // add user to request
             req.user = decoded.user;
             next();
         } catch (error: any) {
-            return res.status(401).json({
-                success: false,
-                status: 401,
-                message: error.message,
-            });
+            return next(new CustomError(401, 'Unauthorized'));
         }
     }
 }
