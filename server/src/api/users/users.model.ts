@@ -18,7 +18,7 @@ const schema = new db.Schema<IUser>(
         },
         password: {
             type: String,
-            required: true,
+            required: false,
         },
         google_auth: {
             type: Boolean,
