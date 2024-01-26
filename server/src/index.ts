@@ -3,6 +3,7 @@ import cors from 'cors';
 import { config } from 'dotenv';
 import express, { Express, json } from 'express';
 import router from './routes';
+import CustomError from './utils/CustomError';
 
 config();
 
@@ -19,5 +20,13 @@ app.use(express.static('public'));
 
 // use routes
 app.use(router);
+
+// add error handler
+app.use((err: CustomError, req: any, res: any, next: any) => {
+    res.status(err.getStatusCode() || 500).json({
+        success: false,
+        message: err.message || 'Something went wrong',
+    });
+});
 
 app.listen(PORT, () => console.log(`app running on port ${PORT}`));
