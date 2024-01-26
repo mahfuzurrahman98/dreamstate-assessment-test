@@ -19,7 +19,7 @@ app.use(cookieParser());
 app.use(express.static('public'));
 
 // use routes
-app.use(router);
+app.use('/api/v1', router);
 
 // add error handler
 app.use((err: CustomError, req: any, res: any, next: any) => {
