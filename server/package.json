@@ -11,14 +11,17 @@
     "author": "mahfuz",
     "license": "ISC",
     "dependencies": {
-        "@types/cors": "^2.8.17",
+        "axios": "^1.6.7",
         "cors": "^2.8.5",
         "dotenv": "^16.4.0",
         "express": "^4.18.2",
+        "jsonwebtoken": "^9.0.2",
         "mongoose": "^8.1.0"
     },
     "devDependencies": {
+        "@types/cors": "^2.8.17",
         "@types/express": "^4.17.21",
+        "@types/jsonwebtoken": "^9.0.5",
         "@types/node": "^20.11.6",
         "ts-node": "^10.9.2"
     }
