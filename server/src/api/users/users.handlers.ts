@@ -1,7 +1,8 @@
 import axios from 'axios';
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { IUser } from '../../interfaces/user';
 import Auth from '../../utils/Auth';
+import CustomError from '../../utils/CustomError';
 import Hash from '../../utils/Hash';
 import userModel from './users.model';
 
@@ -23,7 +24,11 @@ interface GoogleLoginRequestBody {
 const usersHandlers = {
     // get all users
     // it will return a response with all users
-    getAll: async (req: Request, res: Response): Promise<Response> => {
+    getAll: async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<Response | void> => {
         try {
             const users = await userModel.find();
             return res.status(200).json({
@@ -32,49 +37,42 @@ const usersHandlers = {
                 data: users,
             });
         } catch (error: any) {
-            return res.status(500).json({
-                success: false,
-                message: error.message || 'Something went wrong',
-            });
+            return next(
+                new CustomError(500, error.message || 'Something went wrong')
+            );
         }
     },
 
     // create new user
     create: async (
         req: Request<{}, {}, CreateUserRequestBody>,
-        res: Response
-    ): Promise<Response> => {
+        res: Response,
+        next: NextFunction
+    ): Promise<Response | void> => {
         try {
             // get data from request body
             const { name, email, password } = req.body;
 
             // validate data
-            if (!name) {
-                return res.status(422).json({
-                    success: false,
-                    message: 'Name is required',
-                });
+            // name should be present and its a string and should not be empty
+            if (!name || typeof name !== 'string' || name.trim() === '') {
+                return next(new CustomError(422, 'Name is required'));
             }
-            if (!email) {
-                return res.status(422).json({
-                    success: false,
-                    message: 'Email is required',
-                });
+            // email should be present and its a string and should not be empty
+            if (!email || typeof email !== 'string' || email.trim() === '') {
+                return next(new CustomError(422, 'Email is required'));
             }
-            if (!password) {
-                return res.status(422).json({
-                    success: false,
-                    message: 'Password is required',
-                });
+            // password should be present and its a string and should not be empty
+            if (!password || typeof password !== 'string') {
+                return next(new CustomError(422, 'Password is required'));
             }
 
             // check if user already exists
             const existingUser = await userModel.findOne({ email });
             if (existingUser) {
-                return res.status(409).json({
-                    success: false,
-                    message: 'The email address is already in use',
-                });
+                next(
+                    new CustomError(409, 'The email address is already in use')
+                );
             }
 
             // create new user
@@ -97,53 +95,41 @@ const usersHandlers = {
                 data: { user },
             });
         } catch (error: any) {
-            return res.status(500).json({
-                success: false,
-                message: error.message || 'Something went wrong',
-            });
+            return next(
+                new CustomError(500, error.message || 'Something went wrong')
+            );
         }
     },
 
     // login
     login: async (
         req: Request<{}, {}, LoginRequestBody>,
-        res: Response
-    ): Promise<Response> => {
+        res: Response,
+        next: NextFunction
+    ): Promise<Response | void> => {
         try {
             // get data from request body
             const { email, password } = req.body;
 
             // validate data
-            if (!email) {
-                return res.status(422).json({
-                    success: false,
-                    message: 'Email is required',
-                });
+            if (!email || typeof email !== 'string' || email.trim() === '') {
+                return next(new CustomError(422, 'Email is required'));
             }
-            if (!password) {
-                return res.status(422).json({
-                    success: false,
-                    message: 'Password is required',
-                });
+            if (!password || typeof password !== 'string') {
+                return next(new CustomError(422, 'Password is required'));
             }
 
             // check if user exists
             const user = await userModel.findOne({ email });
             if (!user) {
-                return res.status(404).json({
-                    success: false,
-                    message: 'Invalid credentials',
-                });
+                new CustomError(401, 'Invalid credentials');
             }
 
             // check if password is correct
 
             const isPasswordCorrect = await Hash.check(password, user.password);
             if (!isPasswordCorrect) {
-                return res.status(401).json({
-                    success: false,
-                    message: 'Invalid credentials',
-                });
+                return next(new CustomError(401, 'Invalid credentials'));
             }
 
             // create access token, and refresh token
@@ -169,10 +155,7 @@ const usersHandlers = {
                 },
             });
         } catch (error: any) {
-            return res.status(500).json({
-                success: false,
-                message: error.message || 'Something went wrong',
-            });
+            new CustomError(500, error.message || 'Something went wrong');
         }
     },
 
@@ -180,7 +163,7 @@ const usersHandlers = {
     googleOAuthLogin: async (
         req: Request<{}, {}, GoogleLoginRequestBody>,
         res: Response
-    ): Promise<Response> => {
+    ): Promise<Response | void> => {
         try {
             const { code } = req.body;
 
@@ -281,65 +264,68 @@ const usersHandlers = {
     },
 
     // refresh access token
-    refreshToken: async (req: Request, res: Response): Promise<Response> => {
+    refreshToken: async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<Response | void> => {
+        res.setHeader('WWW-Authenticate', 'Bearer');
         const token = req.cookies.refresh_token;
-        console.log('refreh: ', token);
+
         if (!token) {
-            res.setHeader('WWW-Authenticate', 'Bearer');
-            return res.status(401).json({
-                success: false,
-                message: 'Unauthorized',
-            });
+            return next(new CustomError(401, 'Unauthorized'));
         }
 
         try {
             const decoded: any = Auth.decodeRefreshToken(token);
-            console.log(decoded);
+
             // email should be present in payload
             if (!decoded.user || !decoded.user.email) {
-                return res.status(401).json({
-                    success: false,
-                    status: 401,
-                    message: 'Unauthorized',
-                });
+                return next(new CustomError(401, 'Unauthorized'));
             }
             const email = decoded.user.email;
 
             const user: IUser | null = await userModel.findOne({ email });
 
             if (!user) {
-                throw new Error('User not found');
-            }
+                return next(new CustomError(401, 'Unauthorized'));
+            } else {
+                try {
+                    const accessToken = Auth.createAccessToken({
+                        email: user.email,
+                    });
+                    user.password = undefined;
+                    user.deletedAt = undefined;
+                    user.__v = undefined;
 
-            try {
-                const accessToken = Auth.createAccessToken({
-                    email: user.email,
-                });
-                user.password = undefined;
-                user.deletedAt = undefined;
-                user.__v = undefined;
-                // set WWW-Authenticate to Bearer in response header
-                res.setHeader('WWW-Authenticate', 'Bearer');
-
-                return res.status(200).json({
-                    message: 'Authentication successful',
-                    data: { user, accessToken },
-                });
-            } catch (error: any) {
-                throw new Error(error);
+                    return res.status(200).json({
+                        message: 'Authentication successful',
+                        data: { user, accessToken },
+                    });
+                } catch (error: any) {
+                    return next(new CustomError(500, error.message));
+                }
             }
-        } catch (eror: any) {
-            return res.status(500).json({
-                success: false,
-                message: eror.message || 'Internal server error',
-            });
+        } catch (error: any) {
+            return next(new CustomError(error.getStatusCode(), error.message));
         }
     },
 
     // logout
-    logout: async (req: Request, res: Response): Promise<Response> => {
-        res.clearCookie('refresh_token');
-        return res.status(204);
+    logout: async (
+        req: Request,
+        res: Response,
+        next: NextFunction
+    ): Promise<Response | void> => {
+        try {
+            res.clearCookie('refresh_token');
+            return res.status(204).json({
+                success: true,
+                message: 'Logout successful',
+            });
+        } catch (error: any) {
+            return next(new CustomError(500, error.message));
+        }
     },
 };
 

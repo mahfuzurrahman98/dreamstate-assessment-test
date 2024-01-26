@@ -1,31 +1,33 @@
-import { Request, Response, Router } from 'express';
+import { NextFunction, Request, Response, Router } from 'express';
 import usersHandlers from './api/users/users.handlers';
 import Auth from './utils/Auth';
+import CustomError from './utils/CustomError';
 
 const router = Router();
 const authMiddleware = Auth.isAuthenticated;
 
 // home rotue
-router.get('/', authMiddleware, (req: Request, res: Response) => {
-    try {
-        /**
-         * The path to the image file.
-         */
-        const image = '/images/ai.png';
-        res.status(200).json({
-            success: true,
-            message: 'Hello World!',
-            data: {
-                image,
-            },
-        });
-    } catch (error: any) {
-        res.status(500).json({
-            success: false,
-            message: error.message || 'Something went wrong',
-        });
+router.get(
+    '/',
+    authMiddleware,
+    (req: Request, res: Response, next: NextFunction) => {
+        try {
+            /**
+             * The path to the image file.
+             */
+            const image = '/images/ai.png';
+            res.status(200).json({
+                success: true,
+                message: 'Hello World!',
+                data: {
+                    image,
+                },
+            });
+        } catch (error: any) {
+            next(new CustomError(500, error.message || 'Something went wrong'));
+        }
     }
-});
+);
 
 // users routes
 router.get('/users', usersHandlers.getAll); // get all users
