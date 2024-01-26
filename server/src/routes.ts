@@ -1,27 +1,38 @@
 import { Request, Response, Router } from 'express';
 import usersHandlers from './api/users/users.handlers';
+import Auth from './utils/Auth';
+
 const router = Router();
+const authMiddleware = Auth.isAuthenticated;
 
 // home rotue
-router.get('/', (req: Request, res: Response) => {
-    // image is basicallty stored in public folder, file name ai.png
-    const image = '/images/ai.png';
-    res.status(200).json({
-        success: true,
-        message: 'Hello World!',
-        data: {
-            image,
-        },
-    });
+router.get('/', authMiddleware, (req: Request, res: Response) => {
+    try {
+        /**
+         * The path to the image file.
+         */
+        const image = '/images/ai.png';
+        res.status(200).json({
+            success: true,
+            message: 'Hello World!',
+            data: {
+                image,
+            },
+        });
+    } catch (error: any) {
+        res.status(500).json({
+            success: false,
+            message: error.message || 'Something went wrong',
+        });
+    }
 });
 
 // users routes
-router.get('/users', () => {}); // get all users
-router.get('/users/:id', () => {}); // get user by id
-router.post('/users', usersHandlers.create); // create user
-router.put('/users/:id', () => {}); // update user by id
-router.delete('/users/:id', () => {}); // delete user by id
-router.post('/users/login', () => {}); // login user
-router.post('/users/logout', () => {}); // logout user
+router.get('/users', usersHandlers.getAll); // get all users
+
+router.post('/users', usersHandlers.create); // create new user
+router.post('/users/login', usersHandlers.login); // login user
+router.post('/users/refresh-token', usersHandlers.refreshToken); // refresh token
+router.post('/users/logout', usersHandlers.logout); // logout user
 
 export default router;
