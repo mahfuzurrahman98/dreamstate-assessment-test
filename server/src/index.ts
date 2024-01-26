@@ -1,3 +1,4 @@
+import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import { config } from 'dotenv';
 import express, { Express, json } from 'express';
@@ -11,6 +12,7 @@ const PORT = process.env.PORT || 3000;
 // middlewares
 app.use(json());
 app.use(cors());
+app.use(cookieParser());
 
 // add publuc folder as static folder
 app.use(express.static('public'));
