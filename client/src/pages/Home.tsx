@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
+import ComponentLoader from '../components/ComponentLoader';
 import useAuth from '../hooks/useAuth';
 import useAxiosPrivate from '../hooks/useAxiosPrivate';
+import { statusType } from '../types';
 import RootLayout from './RootLayout';
 
 const MessageDiv = () => {
@@ -24,6 +26,10 @@ const Home = () => {
     const axiosPrivate = useAxiosPrivate();
     const [img, setImg] = useState<string>('');
     const { auth } = useAuth();
+    const [status, setStatus] = useState<statusType>({
+        loading: true,
+        error: null,
+    });
 
     const getImage = async () => {
         try {
@@ -38,22 +44,37 @@ const Home = () => {
     useEffect(() => {
         console.log('token:', auth.token);
         console.log('image:', img);
-        auth.token != '' &&
+        if (auth.token != '') {
             (async () => {
                 try {
                     await getImage();
+                    setStatus({
+                        loading: false,
+                        error: null,
+                    });
                 } catch (error: any) {
                     console.log(error);
                 }
             })();
+        } else {
+            setStatus({
+                loading: false,
+                error: null,
+            });
+        }
     }, [auth.token]);
 
     return (
-        <RootLayout>
-            <div className="">
-                {auth.token ? <img src={img} alt="" /> : <MessageDiv />}
-            </div>
-        </RootLayout>
+        <ComponentLoader
+            status={status}
+            component={
+                <RootLayout>
+                    <div className="">
+                        {auth.token ? <img src={img} alt="" /> : <MessageDiv />}
+                    </div>
+                </RootLayout>
+            }
+        />
     );
 };
 
