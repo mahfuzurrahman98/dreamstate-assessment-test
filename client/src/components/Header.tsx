@@ -13,7 +13,7 @@ const Header: FC = () => {
         <div className="flex items-center">
           <Link
             to="/"
-            className="text-2xl font-semibold text-amber-800 leading-none"
+            className="text-2xl font-bold text-amber-800 leading-none"
           >
             MERN Project
           </Link>
