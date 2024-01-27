@@ -34,13 +34,13 @@ const GoogleLoginCallback = () => {
 
     const login = async (code: string) => {
         try {
-            const response = await axios.post('/users/auth/google-login', {
+            const response = await axios.post('/users/google-login', {
                 code,
             });
             const accessToken = response.data.data.accessToken;
 
             let localData = JSON.parse(localStorage.getItem('data') || '{}');
-            localData['message'] = response.data.detail;
+            localData['message'] = response.data.message;
             localStorage.setItem('data', JSON.stringify(localData));
 
             setAuth({ token: accessToken });
