@@ -107,6 +107,7 @@ const usersHandlers = {
         res: Response,
         next: NextFunction
     ): Promise<Response | void> => {
+        console.log('here in login');
         try {
             // get data from request body
             const { email, password } = req.body;
@@ -122,7 +123,7 @@ const usersHandlers = {
             // check if user exists
             const user = await userModel.findOne({ email });
             if (!user) {
-                new CustomError(401, 'Invalid credentials');
+                return next(new CustomError(401, 'Invalid credentials'));
             }
 
             // check if password is correct
@@ -141,7 +142,7 @@ const usersHandlers = {
             });
 
             // set referesh token in the response cookie
-            res.cookie('refresh_token', refreshToken, {
+            res.cookie('refreshToken', refreshToken, {
                 httpOnly: true,
                 secure: process.env.NODE_ENV === 'production',
                 sameSite: 'strict',
@@ -155,7 +156,7 @@ const usersHandlers = {
                 },
             });
         } catch (error: any) {
-            new CustomError(500, error.message || 'Something went wrong');
+            return next(new CustomError(500, error.message || 'Something went wrong'));
         }
     },
 
@@ -186,11 +187,11 @@ const usersHandlers = {
             );
 
             if (response.status === 200) {
-                const access_token = response.data.access_token;
+                const accessToken = response.data.accessToken;
 
                 const userinfo_response = await axios.get(
                     'https://www.googleapis.com/oauth2/v3/userinfo',
-                    { headers: { Authorization: `Bearer ${access_token}` } }
+                    { headers: { Authorization: `Bearer ${accessToken}` } }
                 );
 
                 if (userinfo_response.status === 200) {
@@ -225,16 +226,16 @@ const usersHandlers = {
                         }
 
                         // TODO: Implement token creation logic here
-                        // const access_token = ...;
-                        // const refresh_token = ...;
+                        // const accessToken = ...;
+                        // const refreshToken = ...;
                         // TODO: Implement setting cookies logic here
-                        // res.cookie('refresh_token', refresh_token, { maxAge: max_age_seconds, path: '/', secure: false, httpOnly: true, sameSite: 'strict' });
+                        // res.cookie('refreshToken', refreshToken, { maxAge: max_age_seconds, path: '/', secure: false, httpOnly: true, sameSite: 'strict' });
 
                         return res.status(200).json({
                             message: response_message,
                             data: {
                                 user,
-                                access_token,
+                                accessToken,
                             },
                         });
                     } catch (error: any) {
@@ -270,7 +271,7 @@ const usersHandlers = {
         next: NextFunction
     ): Promise<Response | void> => {
         res.setHeader('WWW-Authenticate', 'Bearer');
-        const token = req.cookies.refresh_token;
+        const token = req.cookies.refreshToken;
 
         if (!token) {
             return next(new CustomError(401, 'Unauthorized'));
@@ -318,7 +319,7 @@ const usersHandlers = {
         next: NextFunction
     ): Promise<Response | void> => {
         try {
-            res.clearCookie('refresh_token');
+            res.clearCookie('refreshToken');
             return res.status(204).json({
                 success: true,
                 message: 'Logout successful',
