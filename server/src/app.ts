@@ -18,6 +18,14 @@ app.use(cookieParser());
 // add publuc folder as static folder
 app.use(express.static('public'));
 
+// welcome message
+app.get('/', (req: any, res: any) => {
+    res.json({
+        success: true,
+        message: 'Welcome to the dreamstate assesment test API',
+    });
+});
+
 // use routes
 app.use('/api/v1', router);
 
