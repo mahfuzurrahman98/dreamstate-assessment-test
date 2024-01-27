@@ -2,20 +2,20 @@ import { axiosPrivate } from '../api/axios';
 import useAuth from './useAuth';
 
 const useLogout = () => {
-  const { setAuth } = useAuth();
+    const { setAuth } = useAuth();
 
-  const logout = async () => {
-    setAuth({
-      token: '',
-    });
-    try {
-      await axiosPrivate.post('/users/auth/logout');
-    } catch (err) {
-      console.error(err);
-    }
-  };
+    const logout = async () => {
+        setAuth({
+            token: '',
+        });
+        try {
+            await axiosPrivate.post('/users/logout');
+        } catch (err) {
+            console.error(err);
+        }
+    };
 
-  return logout;
+    return logout;
 };
 
 export default useLogout;
