@@ -357,10 +357,7 @@ const usersHandlers = {
     ): Promise<Response | void> => {
         try {
             res.clearCookie('refreshToken');
-            return res.status(204).json({
-                success: true,
-                message: 'Logout successful',
-            });
+            return res.status(204);
         } catch (error: any) {
             return next(new CustomError(500, error.message));
         }
