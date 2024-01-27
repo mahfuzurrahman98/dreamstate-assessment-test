@@ -15,7 +15,7 @@ router.get(
             /**
              * The path to the image file.
              */
-            const image = '/images/ai.png';
+            const image = '/assets/images/ai.png';
             res.status(200).json({
                 success: true,
                 message: 'Hello World!',
