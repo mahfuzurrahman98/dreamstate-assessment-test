@@ -30,7 +30,7 @@ const usersHandlers = {
         next: NextFunction
     ): Promise<Response | void> => {
         try {
-            const users = await userModel.find();
+            const users = await userModel?.find();
             return res.status(200).json({
                 success: true,
                 message: 'Users fetched successfully',
@@ -82,7 +82,7 @@ const usersHandlers = {
                 name,
                 email,
                 password: hashedPassword,
-                google_auth: false,
+                googleAuth: false,
                 active: true,
             });
 
@@ -126,8 +126,15 @@ const usersHandlers = {
                 return next(new CustomError(401, 'Invalid credentials'));
             }
 
-            // check if password is correct
+            // check if user has password and googleAuth is false
+            if (user.googleAuth) {
+                return next(new CustomError(401, 'Invalid credentials'));
+            }
+            if (!user.password) {
+                return next(new CustomError(401, 'Invalid credentials'));
+            }
 
+            // check if password is correct
             const isPasswordCorrect = await Hash.check(password, user.password);
             if (!isPasswordCorrect) {
                 return next(new CustomError(401, 'Invalid credentials'));
@@ -144,8 +151,9 @@ const usersHandlers = {
             // set referesh token in the response cookie
             res.cookie('refreshToken', refreshToken, {
                 httpOnly: true,
-                secure: process.env.NODE_ENV === 'production',
+                secure: false,
                 sameSite: 'strict',
+                path: '/',
             });
 
             return res.status(200).json({
@@ -156,18 +164,28 @@ const usersHandlers = {
                 },
             });
         } catch (error: any) {
-            return next(new CustomError(500, error.message || 'Something went wrong'));
+            return next(
+                new CustomError(500, error.message || 'Something went wrong')
+            );
         }
     },
 
     // login through google oauth
     googleOAuthLogin: async (
         req: Request<{}, {}, GoogleLoginRequestBody>,
-        res: Response
+        res: Response,
+        next: NextFunction
     ): Promise<Response | void> => {
         try {
             const { code } = req.body;
 
+            if (!code || typeof code !== 'string' || code.trim() === '') {
+                return next(new CustomError(400, 'Code is required'));
+            }
+
+            // get access token, although we won't use it for our authentication
+            // but it ensures that the user is registered on google,
+            // and we will use it to fetch user information from google
             const data = {
                 code,
                 client_id: process.env.GOOGLE_CLIENT_ID as string,
@@ -176,6 +194,7 @@ const usersHandlers = {
                 grant_type: 'authorization_code' as string,
             };
 
+            // post request to google to get access token
             const response = await axios.post(
                 'https://oauth2.googleapis.com/token',
                 new URLSearchParams(data),
@@ -187,80 +206,98 @@ const usersHandlers = {
             );
 
             if (response.status === 200) {
-                const accessToken = response.data.accessToken;
+                // get user information
+                const gauthAccessToken = response.data.access_token;
 
-                const userinfo_response = await axios.get(
+                const userinfoResponse = await axios.get(
                     'https://www.googleapis.com/oauth2/v3/userinfo',
-                    { headers: { Authorization: `Bearer ${accessToken}` } }
+                    { headers: { Authorization: `Bearer ${gauthAccessToken}` } }
                 );
 
-                if (userinfo_response.status === 200) {
-                    const userinfo = userinfo_response.data;
+                if (userinfoResponse.status === 200) {
+                    const userinfo = userinfoResponse.data;
+                    // console.log('user info:\n', userinfo);
 
-                    let response_message = 'Login successful';
+                    let responseMessage = 'Login successful';
+                    let responseStatus = 200;
 
+                    // create or fetch user based on the email
                     try {
+                        // initialize user as null
+                        let user = null;
+
+                        // check if user already exists
                         const existingUser = await userModel.findOne({
                             email: userinfo.email,
-                            google_auth: true,
+                            googleAuth: true,
                         });
 
                         if (!existingUser) {
-                            const newUser = await userModel.create({
+                            // user does not exist, create new user and assign it to user variable
+                            user = await userModel.create({
                                 name: userinfo.name,
                                 username: userinfo.given_name,
                                 email: userinfo.email,
-                                google_auth: true,
+                                googleAuth: true,
+                                active: true,
                             });
 
-                            response_message = 'Welcome to Codeglimpse!';
+                            responseMessage = 'Welcome, Thanks for signing up!';
+                            responseStatus = 201;
+                        } else {
+                            // user exists, assign it to user variable
+                            user = existingUser;
                         }
-
-                        const user = await userModel.findOne({
-                            email: userinfo.email,
-                            google_auth: true,
-                        });
 
                         if (!user) {
-                            throw new Error('User not found after creation');
+                            return next(
+                                new CustomError(
+                                    500,
+                                    'Failed to create/fetch user'
+                                )
+                            );
                         }
 
-                        // TODO: Implement token creation logic here
-                        // const accessToken = ...;
-                        // const refreshToken = ...;
-                        // TODO: Implement setting cookies logic here
-                        // res.cookie('refreshToken', refreshToken, { maxAge: max_age_seconds, path: '/', secure: false, httpOnly: true, sameSite: 'strict' });
+                        const accessToken = Auth.createAccessToken({
+                            email: user.email,
+                        });
+                        const refreshToken = Auth.createRefreshToken({
+                            email: user.email,
+                        });
 
-                        return res.status(200).json({
-                            message: response_message,
+                        // set referesh token in the response cookie
+                        res.cookie('refreshToken', refreshToken, {
+                            httpOnly: true,
+                            secure: false,
+                            sameSite: 'strict',
+                            path: '/',
+                        });
+                        return res.status(responseStatus).json({
+                            message: responseMessage,
                             data: {
-                                user,
                                 accessToken,
                             },
                         });
                     } catch (error: any) {
-                        return res.status(500).json({
-                            success: false,
-                            message: `${error.message} - Error from user creation or retrieval`,
-                        });
+                        return next(
+                            new CustomError(
+                                500,
+                                `${error.message} - Error from user creation or retrieval`
+                            )
+                        );
                     }
                 } else {
-                    return res.status(401).json({
-                        success: false,
-                        message: 'Failed to fetch user info',
-                    });
+                    return next(
+                        new CustomError(401, 'Failed to fetch user info')
+                    );
                 }
             } else {
-                return res.status(401).json({
-                    success: false,
-                    message: 'Google OAuth login failed',
-                });
+                return next(new CustomError(401, 'Google OAuth login failed'));
             }
         } catch (error: any) {
-            return res.status(500).json({
-                success: false,
-                message: error.message || 'Internal server error',
-            });
+            return next(
+                new CustomError(500, error.message || 'Something went wrong')
+            );
         }
     },
 
