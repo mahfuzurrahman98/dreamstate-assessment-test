@@ -30,7 +30,7 @@ const usersHandlers = {
         next: NextFunction
     ): Promise<Response | void> => {
         try {
-            const users = await userModel?.find();
+            const users = await userModel.find();
             return res.status(200).json({
                 success: true,
                 message: 'Users fetched successfully',
