@@ -34,6 +34,7 @@ router.get('/users', usersHandlers.getAll); // get all users
 
 router.post('/users', usersHandlers.create); // create new user
 router.post('/users/login', usersHandlers.login); // login user
+router.post('/users/google-login', usersHandlers.googleOAuthLogin); // login user with google
 router.post('/users/refresh-token', usersHandlers.refreshToken); // refresh token
 router.post('/users/logout', usersHandlers.logout); // logout user
 
