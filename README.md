@@ -6,7 +6,6 @@
 - [Prerequisites](#prerequisites)
 - [Features](#features)
 - [Technologies Used](#technologies-used)
-- [API Documentation](#api-documentation)
 - [Demo Credentials](#demo-creds)
 - [Contributing](#contributing)
 - [License](#license)
