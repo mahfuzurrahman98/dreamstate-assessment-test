@@ -7,6 +7,7 @@
 - [Features](#features)
 - [Technologies Used](#technologies-used)
 - [API Documentation](#api-documentation)
+- [Demo Credentials](#demo-creds)
 - [Contributing](#contributing)
 - [License](#license)
 
@@ -47,6 +48,17 @@ This project is a web application built using the MERN stack (MongoDB, Express.j
 - **Development Tools:**
   - npm (Node Package Manager)
   - Git
+
+## Demo Credentials
+
+As this project doesn’t have user registration feature, So we have a demo user for now.
+
+email: reza@gmail.com
+password: rezaPass
+
+Still, we can create new users using the API endpoint.
+
+POST: /api/v1/users
 
 ## Contributing
 
