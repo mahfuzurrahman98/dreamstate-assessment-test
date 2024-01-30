@@ -32,7 +32,7 @@ This project is a web application built using the MERN stack (MongoDB, Express.j
   - React
   - TypeScript
   - HTML/CSS
-  - (Additional frontend technologies or libraries used)
+  - Tailwind CSS
   
 - **Backend:**
   - Node.js
@@ -42,7 +42,7 @@ This project is a web application built using the MERN stack (MongoDB, Express.j
   
 - **Authentication:**
   - JSON Web Tokens (JWT) for authentication
-  - Passport.js for Google OAuth integration
+  - Google OAuth integration using direct API call
   
 - **Development Tools:**
   - npm (Node Package Manager)
@@ -53,11 +53,11 @@ This project is a web application built using the MERN stack (MongoDB, Express.j
 We welcome contributions from the community! If you'd like to contribute to this project, please follow these guidelines:
 
 1. Fork the repository.
-2. Create a new branch for your feature or bug fix:
+2. Create a new branch for your feature or bug fix.
 3. Make your changes.
 4. Test your changes thoroughly.
-5. Commit your changes:
-6. Push to your branch:
+5. Commit your changes.
+6. Push to your branch.
 7. Submit a pull request.
 
 We appreciate your contributions!
