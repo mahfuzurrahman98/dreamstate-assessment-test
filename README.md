@@ -6,7 +6,7 @@
 - [Prerequisites](#prerequisites)
 - [Features](#features)
 - [Technologies Used](#technologies-used)
-- [API Documentation](#api-documentation
+- [API Documentation](#api-documentation)
 - [Demo Credentials](#demo-credentials)
 - [Contributing](#contributing)
 - [License](#license)
@@ -30,28 +30,29 @@ This project is a web application built using the MERN stack (MongoDB, Express.j
 ## Technologies Used
 
 - **Frontend:**
+
   - React
   - TypeScript
   - HTML/CSS
   - Tailwind CSS
-  
 - **Backend:**
+
   - Node.js
   - Express.js
   - TypeScript
   - MongoDB (with Mongoose for object modeling)
-  
 - **Authentication:**
+
   - JSON Web Tokens (JWT) for authentication
   - Google OAuth integration using the direct API call
-  
 - **Development Tools:**
+
   - npm (Node Package Manager)
   - Git
 
 ## API Documentation
 
-https://documenter.getpostman.com/view/23180955/2s9YytfLWK
+[https://documenter.getpostman.com/view/23180955/2s9YytfLWK](https://documenter.getpostman.com/view/23180955/2s9YytfLWK "Postam API doc")
 
 ## Demo Credentials
 
