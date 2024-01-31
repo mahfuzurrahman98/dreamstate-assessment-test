@@ -58,12 +58,17 @@ This project is a web application built using the MERN stack (MongoDB, Express.j
 
 This project doesn’t have a user registration feature, so we have a demo user for now.
 
-email: reza@gmail.com
-password: rezaPass
+```
+{
+    "email": "reza@gmail.com",
+    "password": "rezaPass"
+}
+```
+
 
 Still, we can create new users using the API endpoint.
 
-POST: /api/v1/users
+`POST: /api/v1/users`
 
 ## Contributing
 
