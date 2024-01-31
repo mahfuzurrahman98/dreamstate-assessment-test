@@ -56,19 +56,22 @@ This project is a web application built using the MERN stack (MongoDB, Express.j
 
 ## Demo Credentials
 
-This project doesn’t have a user registration feature, so we have a demo user for now.
+This project doesn’t have a user registration feature, so we have a demo user already registered.
 
-```
-{
-    "email": "reza@gmail.com",
-    "password": "rezaPass"
-}
-```
+Creds: email = reza@gmail.com, and password = rezaPass
 
 
 Still, we can create new users using the API endpoint.
 
-`POST: /api/v1/users`
+`POST: /api/v1/users
+`
+
+```
+{
+    "email": "you@email.com",
+    "password": "yourPass"
+}
+```
 
 ## Contributing
 
