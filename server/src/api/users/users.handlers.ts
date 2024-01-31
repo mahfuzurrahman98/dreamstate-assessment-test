@@ -311,7 +311,7 @@ const usersHandlers = {
         const token = req.cookies.refreshToken;
 
         if (!token) {
-            return next(new CustomError(401, 'Unauthorized'));
+            return next(new CustomError(400, 'Unauthorized'));
         }
 
         try {
@@ -319,14 +319,14 @@ const usersHandlers = {
 
             // email should be present in payload
             if (!decoded.user || !decoded.user.email) {
-                return next(new CustomError(401, 'Unauthorized'));
+                return next(new CustomError(400, 'Unauthorized'));
             }
             const email = decoded.user.email;
 
             const user: IUser | null = await userModel.findOne({ email });
 
             if (!user) {
-                return next(new CustomError(401, 'Unauthorized'));
+                return next(new CustomError(400, 'Unauthorized'));
             } else {
                 try {
                     const accessToken = Auth.createAccessToken({
