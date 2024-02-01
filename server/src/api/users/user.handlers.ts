@@ -4,7 +4,7 @@ import { IUser } from '../../interfaces/user';
 import Auth from '../../utils/Auth';
 import CustomError from '../../utils/CustomError';
 import Hash from '../../utils/Hash';
-import userModel from './users.model';
+import userModel from './user.model';
 
 interface CreateUserRequestBody {
     name: string;

@@ -1,5 +1,5 @@
 import { NextFunction, Request, Response, Router } from 'express';
-import usersHandlers from './api/users/users.handlers';
+import usersHandlers from './api/users/user.handlers';
 import Auth from './utils/Auth';
 import CustomError from './utils/CustomError';
 
