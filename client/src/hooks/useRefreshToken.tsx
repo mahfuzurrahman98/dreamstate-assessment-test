@@ -18,8 +18,8 @@ const useRefreshToken = () => {
 
             return data.accessToken;
         } catch (error) {
+            await logout();
             console.log('error from useRefreshToken.tsx', error);
-            logout();
             throw error;
         }
     };
